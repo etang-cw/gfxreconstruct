@@ -135,6 +135,8 @@ def parse_args():
         '--cmake-extra', dest='cmake_extra',
         action='append', default=[],
         help='Extra variables to set on the cmake invocation')
+    arg_parser.add_argument(
+        '--parallel', action='store_true', default=False, help='Do a multi-threaded build')
     return arg_parser.parse_args()
 
 
@@ -306,6 +308,8 @@ def cmake_build(args):
             ['--config', args.configuration.capitalize()])
     if args.clean or args.clobber:
         cmake_build_args.extend(['--target', 'clean'])
+    elif args.parallel:
+        cmake_build_args.extend(['--parallel', str(os.cpu_count())])
     cmake_build_result = subprocess.run(
         cmake_build_args,
         cwd=get_build_dir(args.build_dir, args.configuration, args.architecture))
